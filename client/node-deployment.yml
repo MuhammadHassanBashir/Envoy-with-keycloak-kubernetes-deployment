@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-app-deployment
+  namespace: default  # Adjust the namespace if necessary
+spec:
+  replicas: 1  # Number of replicas for your app
+  selector:
+    matchLabels:
+      app: nodejs-app
+  template:
+    metadata:
+      labels:
+        app: nodejs-app
+    spec:
+      containers:
+        - name: nodejs-app
+          image: gcr.io/world-learning-400909/node-js:latest  # Replace with your custom image or use a public Node.js image
+          ports:
+            - containerPort: 8000  # Exposed port for your app
+#          env:
+#            - name: NODE_ENV
+#              value: production  # Optional: set your environment variable
+#          volumeMounts:
+#            - name: app-volume
+#              mountPath: /usr/src/app  # Mount the app directory to the container
+#      volumes:
+#        - name: app-volume
+#          configMap:
+#            name: nodejs-app-config  # ConfigMap (if any) for environment variables or config files
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejs-app-service
+  namespace: default  # Adjust the namespace if necessary
+spec:
+  selector:
+    app: nodejs-app  # Should match the label in the Deployment
+  ports:
+    - protocol: TCP
+      port: 80  # The port exposed by the service
+      targetPort: 8000  # The port your app is listening on inside the container
+  type: LoadBalancer  # Change to LoadBalancer or NodePort if needed for external access
+
+
