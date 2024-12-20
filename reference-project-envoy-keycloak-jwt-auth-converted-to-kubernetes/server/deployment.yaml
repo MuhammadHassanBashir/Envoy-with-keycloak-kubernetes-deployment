@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+  namespace: default  # Adjust the namespace if necessary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: server
+          # Assuming the image is built and pushed to a registry
+          image: gcr.io/world-learning-400909/server:v1  # Replace with your image name
+          ports:
+            - containerPort: 8081  # The port that the server listens to
+          env:
+            - name: SERVER_PUBLISHED_PORT
+              value: "8081"  # You can use an environment variable if needed
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-service
+  namespace: default  # Adjust the namespace if necessary
+spec:
+  selector:
+    app: server
+  ports:
+    - protocol: TCP
+      port: 8081  # The port exposed by the service
+      targetPort: 8081  # The port that the server container listens on
+  type: LoadBalancer  # Can be ClusterIP or NodePort depending on your needs
