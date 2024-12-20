@@ -11,13 +11,36 @@ The goal of this proof of concept (POC) is to set up a system where a server is 
 
 This pattern allows the server to be free of any authentication logic, enabling developers to focus on the core business logic of the application. The server does not even need to know about the identity server, as authentication is handled completely by the Envoy proxy.
 
-## Docker Environment
+## RUN keycloak on kubenretes cluster
 
-This POC uses a fully Dockerized environment. To set up and start the environment, run the following command in your terminal:
+First of all go to keycloak folder deploy keycloak and postgress db on cluster with below command.
 
-```bash
-docker-compose --env-file config/.env up -d
-```
+    kubectl apply -f keycloak-postgres.yaml
+
+    get the external ip and port of keycloak service and open this service from browser. "http://external-ip-address-keycloak:<port>" 
+
+    and use credentail for "user: admin and password: admin".
+
+    now go inside the keycloak and take secret under credentail section and add that secret in "client's dockerfile as env" like(client>dockerfile>env)
+
+
+## RUN Envoy on kubenretes cluster
+
+Second go to envoy folder and deploy envoy on kubernetes cluster. Before this take "external ip address for keycloak service and add in envoy configmap under **issuer , remote jwt uri and keycloak cluster backend**
+
+then apply below command for running envoy on kubernetes cluster.
+
+  kubectl apply -f envoy-kubernetes-file.yml
+
+## RUN BACKEND SERVER
+
+  go inside the server folder and use below command to run backend server.
+
+  k apply -f deployment.yaml
+
+## RUN Client 
+
+  go inside the client folder under "client.js"
 
 ### This command will set up the following components:
 - **Keycloak Identity Server**: An authentication server using Keycloak, along with a PostgreSQL database.
