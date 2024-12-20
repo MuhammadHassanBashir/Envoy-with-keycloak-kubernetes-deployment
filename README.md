@@ -34,13 +34,30 @@ then apply below command for running envoy on kubernetes cluster.
 
 ## RUN BACKEND SERVER
 
-  go inside the server folder and use below command to run backend server.
+  go inside the server folder and build dockerfile and push images to google repo, use below command to run backend server.
 
   k apply -f deployment.yaml
 
 ## RUN Client 
 
-  go inside the client folder under "client.js"
+  go inside the "client folder" under "client.js" file and add "external ip for keycloak and envoy" in client.js file. and build the docker file and push this to google repo and deploy the client on kubernetes cluster by below command
+
+    k apply -f node-deployment.yml
+
+## Verification
+
+    go inside any kubernetes pod, and use below command to get key from keycloak and use that to check the request authentication envoy directly.. apko verify hojye ga k jb envoy per traffic client sa aye gi tu kesa response hoga.. command to get keycloak access key.
+
+        curl -L --insecure -s -X POST 'http://34.135.41.24:8080/realms/Envoy-Keycloak-POC/protocol/openid-connect/token' -H 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'client_id=poc-client' --data-urlencode 'grant_type=client_credentials' --data-urlencode 'client_secret=0427f0fd-197a-412e-a036-a40136680831'
+
+   34.135.41.24:     this is keycloak public ip...
+
+    and use this key in your authorization request shown in below. and it will give you the backend server data or header what ever you side.
+
+        curl -X GET 'http://34.58.150.119:10000' -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJIMVk2N0w3YzVHZkJ1T0owczZSTHAxUGFYZmVabVlZTElsV2d0UDRla2tzIn0.eyJleHAiOjE3MzQ3MjcwNTYsImlhdCI6MTczNDcyNjc1NiwianRpIjoiYTFkNDE2OTktYWI5Mi00Y2M4LWI2MjUtM2RmYzZkM2E2MDZjIiwiaXNzIjoiaHR0cDovLzM0LjEzNS40MS4yNDo4MDgwL3JlYWxtcy9FbnZveS1LZXljbG9hay1QT0MiLCJzdWIiOiJmYjRiYTQ1Zi01MDNhLTQ0ZTQtODU0OC1lMjI5MzUwNWZiMWMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJwb2MtY2xpZW50IiwiYWNyIjoiMSIsInNjb3BlIjoiZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJwb2MtY2xpZW50IiwiY2xpZW50SG9zdCI6IjEwLjEwMC4wLjEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtcG9jLWNsaWVudCIsImNsaWVudEFkZHJlc3MiOiIxMC4xMDAuMC4xIn0.g5jfzM7VP1IsRB98tMie0svKZsJoY_8ReFCYmQTu2_CQNMBFiE-9bw2riPtesQ0rfmMLHybuzhCw4x-1TKzT2cBPZBtXLrmSXEQBsA6ZdONLItrvqiV44SMbRjbyd08-4VeSLXXsLdgR0wQ4B-MW7SnaIjDbtx12WVp3PHBQwZOtBpd-6rk25jIJ989RJGhL_lwwy1ol8VHV_S8wvnk0PWCETz7KQRDhpmfVqzgGYAdo26orn3Lzs01iLKw8_NBo7eWYeRNfJjUMYBn7SrHDwhEpM7eFuL3sQFX8JhAq7NKhQGav3v-xGrRvtA71ih3oc2U_XzM_T2ktTU6QOUJ9OQ" -H "Content-Type: application/json"
+
+
+    http://34.58.150.119:10000 --- is envoy pod external ip and envoy port
 
 ### This command will set up the following components:
 - **Keycloak Identity Server**: An authentication server using Keycloak, along with a PostgreSQL database.
